@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)https://jelin-cc.github.io/tier-maker/ -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기업 리뷰 킹받음 티어표</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:#191B20;color:#ECECEC;}
+.screen{display:none;height:100vh;overflow:hidden;}
+.screen.active{display:flex;flex-direction:column;}
+.container{max-width:1060px;margin:0 auto;width:100%;}
+
+/* ===== START ===== */
+#startScreen{
+  justify-content:center;align-items:center;text-align:center;
+  padding:40px 24px;overflow-y:auto;position:relative;
+  background:radial-gradient(ellipse at 50% 30%,#1E2433 0%,#191B20 70%);
+}
+/* Floating decorative blobs */
+.start-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;}
+.blob-1{width:400px;height:400px;background:#FFD5D5;top:-100px;left:-100px;animation:floatBlob 8s ease-in-out infinite;}
+.blob-2{width:350px;height:350px;background:#DBA8E0;bottom:-80px;right:-80px;animation:floatBlob 10s ease-in-out infinite reverse;}
+.blob-3{width:300px;height:300px;background:#6DB5A0;top:50%;left:60%;animation:floatBlob 12s ease-in-out infinite 2s;}
+@keyframes floatBlob{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,-20px);}}
+
+.start-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;}
+.start-chick{margin-bottom:16px;margin-top:8px;}
+.start-chick svg{width:80px;height:56px;animation:chickBreathe 3s ease-in-out infinite;}
+.start-chick-bubble{
+  display:inline-block;padding:8px 16px;
+  background:#FFF9DB;color:#191B20;font-size:13px;font-weight:600;
+  border-radius:14px 14px 14px 4px;margin-bottom:8px;
+  animation:bubblePop .5s ease;
+}
+.s-title{
+  font-size:44px;font-weight:800;line-height:1.25;margin-bottom:16px;
+  background:linear-gradient(135deg,#FFD93D 0%,#FF6B6B 50%,#DBA8E0 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.s-sub{font-size:17px;color:#6B6E76;margin-bottom:44px;line-height:1.7;}
+.s-field{width:320px;max-width:90vw;display:flex;flex-direction:column;gap:12px;}
+.s-input{
+  width:100%;padding:16px 20px;border:1.5px solid #2E3038;border-radius:16px;
+  background:#22242A;color:#fff;font-size:16px;font-family:'Pretendard',sans-serif;
+  text-align:center;outline:none;transition:border-color .2s;
+}
+.s-input:focus{border-color:#00C473;}
+.s-input::placeholder{color:#4E5058;}
+.btn-blue{
+  width:100%;padding:16px;border:none;border-radius:16px;
+  background:#00C473;color:#fff;font-size:17px;font-weight:700;
+  cursor:pointer;font-family:'Pretendard',sans-serif;transition:all .2s;
+}
+.btn-blue:hover{background:#00A65E;transform:translateY(-1px);}
+.btn-blue:disabled{background:#2E3038;color:#4E5058;cursor:not-allowed;transform:none;}
+.s-divider{width:100%;height:1px;background:#2E3038;margin:20px 0;}
+.btn-ghost{
+  width:100%;padding:14px;border:1.5px solid #2E3038;border-radius:16px;
+  background:transparent;color:#6B6E76;font-size:15px;font-weight:600;
+  cursor:pointer;font-family:'Pretendard',sans-serif;transition:all .2s;
+}
+.btn-ghost:hover{background:#22242A;color:#ECECEC;border-color:#3E4048;}
+
+/* Marquee blinded review cards */
+.start-marquee{
+  width:100vw;overflow:hidden;margin-bottom:28px;
+  mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);
+}
+.marquee-track{display:flex;gap:16px;width:max-content;animation:marqueeScroll 45s linear infinite;}
+.marquee-card{
+  flex-shrink:0;width:260px;height:180px;background:#fff;border-radius:12px;
+  overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.25);position:relative;opacity:.7;
+}
+.marquee-card .rc{transform:scale(.65);transform-origin:top left;width:154%;}
+.marquee-tag{
+  position:absolute;bottom:0;left:0;right:0;padding:8px 10px;text-align:center;
+  background:linear-gradient(to top,rgba(0,0,0,.7) 40%,transparent);
+  color:#fff;font-size:11px;font-weight:700;letter-spacing:.3px;
+}
+@keyframes marqueeScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* ===== TIER SCREEN ===== */
+#tierScreen{overflow:hidden;}
+.t-header{
+  display:flex;justify-content:center;
+  padding:14px 24px;border-bottom:1px solid #2E3038;flex-shrink:0;background:#191B20;
+}
+.t-header-inner{display:flex;justify-content:space-between;align-items:center;max-width:1060px;width:100%;}
+.t-header h2{font-size:17px;font-weight:700;}
+.t-submit{
+  padding:10px 24px;border:none;border-radius:12px;
+  background:#2E3038;color:#4E5058;font-size:14px;font-weight:700;
+  cursor:default;font-family:'Pretendard',sans-serif;transition:all .2s;
+}
+.t-submit.ready{background:#00C473;color:#fff;cursor:pointer;}
+.t-submit.ready:hover{background:#00A65E;}
+.t-body{flex:1;display:flex;min-height:0;max-width:1060px;margin:0 auto;width:100%;}
+
+/* LEFT: Tier Table */
+.t-left{width:600px;flex-shrink:0;display:flex;flex-direction:column;padding:8px;gap:4px;border-right:1px solid #2E3038;}
+.tier-row{
+  flex:1;display:flex;align-items:stretch;cursor:pointer;
+  transition:all .15s;border-radius:12px;overflow:hidden;
+}
+.tier-row:hover .tier-row-chips{background:#2A2C34;}
+.tier-row.drag-over .tier-row-chips{background:#333844;box-shadow:0 0 0 2px rgba(255,255,255,0.2) inset;}
+.tier-row.highlight .tier-row-chips{background:#333844;box-shadow:0 0 0 2px rgba(255,255,255,0.15) inset;}
+.tier-row-label{
+  width:140px;min-width:140px;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:12px 16px;font-size:14px;font-weight:700;color:#191B20;
+  border-radius:12px 0 0 12px;
+}
+.tier-row-label small{font-size:10px;font-weight:400;opacity:.5;margin-top:2px;}
+.tier-row-chips{
+  flex:1;display:flex;flex-wrap:wrap;gap:6px;
+  padding:10px 14px;align-items:center;align-content:center;
+  background:#22242A;transition:background .15s;
+  border-radius:0 12px 12px 0;
+}
+.tier-chip{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:5px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;cursor:pointer;transition:all .15s;position:relative;
+}
+.tier-chip:hover{background:rgba(255,255,255,0.14);}
+.tier-chip-thumb{
+  width:100px;height:70px;background:#fff;border-radius:6px;overflow:hidden;
+}
+.tier-chip-thumb .rc{transform:scale(.25);transform-origin:top left;width:400%;pointer-events:none;}
+.tier-chip-label{font-size:10px;font-weight:600;color:#ECECEC;white-space:nowrap;}
+.tier-chip-arrows{
+  position:absolute;right:3px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:2px;opacity:0;transition:opacity .15s;z-index:3;
+}
+.tier-chip:hover .tier-chip-arrows{opacity:1;}
+.tier-chip-arrow{
+  width:20px;height:20px;border:none;border-radius:5px;
+  background:rgba(0,0,0,.55);color:#fff;font-size:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+}
+.tier-chip-arrow:hover{background:rgba(0,0,0,.85);}
+.tier-chip.chip-dragging{opacity:.3;transform:scale(.95);}
+.chip-drag-clone{
+  position:fixed;z-index:10000;pointer-events:none;opacity:.9;
+  transform:scale(.85);box-shadow:0 12px 40px rgba(0,0,0,.4);
+  border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.15);
+}
+/* Chip preview tooltip */
+.chip-preview{
+  display:none;position:fixed;z-index:200;width:380px;
+  background:#fff;border-radius:14px;overflow:hidden;
+  box-shadow:0 12px 48px rgba(0,0,0,0.45);pointer-events:none;
+  border:1px solid rgba(0,0,0,0.06);
+}
+.chip-preview.visible{display:block;}
+.tier-chip.removing{animation:chipOut .25s ease forwards;}
+
+/* RIGHT: Card + Chick */
+.t-right{
+  flex:1;display:flex;flex-direction:column;
+  padding:20px;position:relative;background:#1E2028;
+  min-width:0;
+}
+.t-progress{text-align:center;font-size:15px;font-weight:700;color:#6B6E76;margin-bottom:12px;flex-shrink:0;}
+.t-progress span{color:#00C473;font-size:20px;}
+.t-card-area{flex:1;position:relative;overflow-y:auto;overflow-x:hidden;min-height:0;}
+.t-card{
+  width:100%;background:#fff;border-radius:16px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.2);overflow:hidden;
+  cursor:grab;user-select:none;-webkit-user-select:none;
+}
+.t-card:active{cursor:grabbing;}
+.t-card.dragging-src{opacity:.3;transform:scale(.96);}
+.drag-clone{
+  position:fixed;z-index:10000;pointer-events:none;
+  opacity:.92;transform:scale(.85);
+  box-shadow:0 16px 48px rgba(0,0,0,0.35);
+  border-radius:16px;overflow:hidden;background:#fff;
+  transition:transform .1s;
+}
+.t-card.slide-in{animation:slideIn .5s cubic-bezier(.4,0,.2,1) forwards;}
+.t-card.slide-out{animation:slideOut .35s cubic-bezier(.4,0,1,1) forwards;}
+.t-card.waiting{transform:translateX(120%);opacity:0;}
+.t-card-hint{
+  padding:10px 16px;background:#E8F5E9;font-size:13px;font-weight:700;
+  color:#2E7D32;text-align:center;
+}
+.t-card-empty{display:flex;align-items:center;justify-content:center;height:200px;color:#4E5058;font-size:15px;}
+
+/* Chick */
+.chick-area{
+  position:absolute;bottom:20px;right:24px;
+  display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+  pointer-events:none;z-index:10;
+}
+.chick-bubble{
+  background:#FFF9DB;color:#191B20;padding:10px 16px;
+  border-radius:16px 16px 4px 16px;font-size:13px;font-weight:600;
+  box-shadow:0 2px 12px rgba(0,0,0,0.1);max-width:200px;text-align:right;
+  animation:bubblePop .3s ease;
+}
+.chick-svg{width:80px;height:56px;animation:chickBreathe 3s ease-in-out infinite;}
+
+/* Beak animation */
+.chick-beak{transform-origin:140px 70px;transition:transform .15s;}
+.chick-speaking .chick-beak{animation:beakOmu .3s ease-in-out 6 alternate;}
+@keyframes beakOmu{
+  0%{transform:scale(1);}
+  100%{transform:scale(1.4) translateY(1px);}
+}
+@keyframes slideIn{from{transform:translateX(80px) scale(.95);opacity:0;}to{transform:translateX(0) scale(1);opacity:1;}}
+@keyframes slideOut{from{transform:translateX(0) scale(1);opacity:1;}to{transform:translateX(-100%) scale(.9);opacity:0;}}
+@keyframes chipOut{to{transform:scale(0);opacity:0;}}
+@keyframes bubblePop{from{transform:scale(.8);opacity:0;}to{transform:scale(1);opacity:1;}}
+@keyframes chickBreathe{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+
+/* ===== REVIEW CARD ===== */
+.rc{padding:18px 20px;color:#191B20;font-size:13px;}
+.rc-top{display:flex;gap:8px;align-items:center;margin-bottom:4px;}
+.rc-company{font-size:16px;font-weight:700;}
+.rc-meta{display:flex;gap:6px;align-items:center;margin-bottom:12px;font-size:12px;color:#8B95A1;}
+.rc-meta-sep{width:1px;height:10px;background:#E5E8EB;}
+.rc-body{display:flex;gap:16px;}
+.rc-left{width:110px;flex-shrink:0;}
+.rc-right{flex:1;min-width:0;}
+.rc-score{font-size:22px;font-weight:800;margin-bottom:2px;}
+.rc-stars{display:flex;gap:1px;margin-bottom:10px;font-size:14px;}
+.rc-star-on{color:#00C362;}.rc-star-off{color:#E5E8EB;}
+.rc-det{margin-bottom:6px;}
+.rc-det-l{font-size:11px;color:#4E5058;margin-bottom:2px;}
+.rc-det-bar{width:90px;height:4px;background:#E5E8EB;border-radius:2px;overflow:hidden;}
+.rc-det-fill{height:100%;background:#00C362;border-radius:2px;}
+.rc-title{font-size:14px;font-weight:700;line-height:1.5;margin-bottom:10px;}
+.rc-sec{margin-bottom:8px;}
+.rc-tag{display:inline-block;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:600;margin-bottom:4px;}
+.rc-tag-pro{background:#E8F4FD;color:#2196F3;}
+.rc-tag-con{background:#FFF0F0;color:#F04452;}
+.rc-tag-mgmt{background:#F2F4F6;color:#6B6E76;}
+.rc-text{font-size:12px;color:#333D4B;line-height:1.55;}
+.rc-footer{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid #F2F4F6;font-size:11px;color:#8B95A1;font-weight:500;}
+.rc-footer-sep{width:1px;height:10px;background:#E5E8EB;}
+.blurred{filter:blur(10px);user-select:none;pointer-events:none;}
+.rc-meta.blurred{filter:blur(5px);background:rgba(0,0,0,.06);border-radius:4px;padding:4px 8px;}
+
+/* ===== DONE ===== */
+#doneScreen{
+  justify-content:center;align-items:center;text-align:center;
+  padding:40px 24px;background:#191B20;overflow-y:auto;
+}
+.done-icon{font-size:72px;margin-bottom:20px;}
+.done-title{font-size:28px;font-weight:800;margin-bottom:12px;}
+.done-sub{font-size:16px;color:#6B6E76;margin-bottom:36px;}
+.done-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.done-btns .btn-blue{width:auto;padding:14px 36px;}
+
+/* ===== RESULTS ===== */
+#resultsScreen{padding:0;background:#191B20;overflow-y:auto;}
+.r-wrap{width:100%;max-width:1108px;margin:0 auto;padding:32px 24px 60px;}
+.r-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.r-header h2{font-size:24px;font-weight:800;}
+.r-sub{font-size:14px;color:#4E5058;margin-bottom:28px;}
+.r-tabs{display:inline-flex;gap:4px;background:#22242A;border-radius:12px;padding:4px;margin-bottom:28px;}
+.r-tab{
+  padding:10px 24px;border:none;border-radius:10px;background:transparent;
+  color:#6B6E76;font-size:14px;font-weight:600;cursor:pointer;
+  font-family:'Pretendard',sans-serif;transition:all .2s;
+}
+.r-tab.active{background:#2E3038;color:#ECECEC;}
+.r-back{
+  padding:8px 16px;border:1.5px solid #2E3038;border-radius:10px;
+  background:transparent;color:#6B6E76;font-size:13px;cursor:pointer;
+  font-family:'Pretendard',sans-serif;
+}
+.r-back:hover{color:#ECECEC;}
+
+/* Dashboard - Redesigned */
+.dash-insight{
+  background:#22242A;border:1px solid #2E3038;border-radius:20px;
+  padding:32px;margin-bottom:20px;
+}
+.dash-insight-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.dash-insight-title{font-size:18px;font-weight:800;}
+.dash-insight-count{font-size:14px;color:#4E5058;font-weight:500;}
+.dash-quote{
+  font-size:16px;color:#8B95A1;margin-bottom:28px;
+  padding-left:16px;border-left:3px solid #00C473;line-height:1.6;
+}
+.dash-quote strong{color:#ECECEC;font-weight:700;}
+.dash-rank-list{display:flex;flex-direction:column;gap:12px;}
+.dash-rank-item{display:flex;align-items:center;gap:14px;}
+.dash-rank-num{
+  width:32px;height:32px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;color:#191B20;flex-shrink:0;
+}
+.dash-rank-name{width:100px;font-size:15px;font-weight:700;flex-shrink:0;}
+.dash-rank-bar-wrap{flex:1;height:32px;background:#2E3038;border-radius:8px;overflow:hidden;position:relative;}
+.dash-rank-bar-fill{
+  height:100%;border-radius:8px;display:flex;align-items:center;
+  padding-right:12px;justify-content:flex-end;
+  font-size:13px;font-weight:700;color:#191B20;
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+}
+.dash-rank-tier{
+  font-size:12px;color:#6B6E76;margin-left:12px;flex-shrink:0;width:36px;text-align:right;
+}
+
+/* Tier distribution */
+.dash-dist{
+  background:#22242A;border:1px solid #2E3038;border-radius:20px;
+  padding:32px;
+}
+.dash-dist-title{font-size:16px;font-weight:700;color:#ECECEC;margin-bottom:20px;}
+.heat-grid{display:flex;flex-direction:column;gap:10px;}
+.heat-row{display:flex;align-items:center;gap:12px;}
+.heat-lbl{width:100px;font-size:13px;color:#8B95A1;text-align:right;flex-shrink:0;}
+.heat-bar{flex:1;height:32px;display:flex;border-radius:8px;overflow:hidden;background:#2E3038;}
+.heat-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#191B20;}
+.heat-legend{display:flex;gap:14px;margin-top:16px;justify-content:center;flex-wrap:wrap;}
+.heat-legend-i{display:flex;align-items:center;gap:4px;font-size:11px;color:#6B6E76;}
+.heat-legend-d{width:10px;height:10px;border-radius:3px;}
+
+/* Participants */
+#dashTab,#ptcpTab{width:100%;box-sizing:border-box;}
+.p-list{display:flex;flex-direction:column;gap:6px;width:100%;}
+.p-item{
+  display:flex;align-items:center;gap:14px;width:100%;box-sizing:border-box;
+  padding:14px 16px;background:#22242A;border:1px solid #2E3038;
+  border-radius:14px;cursor:pointer;transition:all .15s;
+}
+.p-item:hover{background:#2A2C32;}
+.p-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+.p-info{flex:1;}
+.p-name{font-size:15px;font-weight:600;}
+.p-time{font-size:12px;color:#4E5058;margin-top:2px;}
+.p-del{padding:5px 12px;border:1px solid #2E3038;border-radius:8px;background:transparent;color:#6B6E76;font-size:12px;cursor:pointer;font-family:'Pretendard',sans-serif;}
+.p-del:hover{border-color:#F04452;color:#F04452;}
+.p-arrow{color:#4E5058;font-size:18px;}
+.no-data{text-align:center;padding:60px 20px;color:#4E5058;font-size:15px;line-height:1.7;}
+
+/* Modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;justify-content:center;align-items:center;padding:20px;backdrop-filter:blur(4px);}
+.modal.open{display:flex;}
+.modal-box{background:#22242A;border:1px solid #2E3038;border-radius:20px;padding:28px;max-width:640px;width:100%;max-height:85vh;overflow-y:auto;}
+.modal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.modal-top h3{font-size:18px;font-weight:700;}
+.modal-x{width:36px;height:36px;border:none;border-radius:10px;background:#2E3038;color:#6B6E76;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.modal-x:hover{background:#3E4048;color:#fff;}
+.modal-tl{display:flex;flex-direction:column;gap:6px;}
+.modal-tr{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.02);}
+.modal-tlab{width:130px;min-width:130px;font-weight:700;font-size:12px;text-align:center;padding:6px 8px;border-radius:6px;color:#191B20;line-height:1.3;}
+.modal-ti{flex:1;display:flex;flex-wrap:wrap;gap:6px;}
+.modal-tc{padding:5px 12px;background:#2E3038;border-radius:6px;font-size:12px;color:#ECECEC;}
+.confetti-piece{position:fixed;z-index:200;pointer-events:none;}
+
+@media(max-width:960px){
+  .t-body{flex-direction:column;}
+  .t-left{width:100%;border-right:none;border-bottom:1px solid #2E3038;min-height:200px;flex-shrink:0;}
+  .t-right{flex:1;padding:16px;}
+  .tier-row-label{width:100px;min-width:100px;font-size:11px;}
+  .tier-row-label small{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- START -->
+<div id="startScreen" class="screen active">
+  <div class="start-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+  <div class="start-content">
+    <div class="start-chick">
+      <div class="start-chick-bubble">어떤게 제일 킹 받을까?</div><br>
+      <svg viewBox="0 0 200 140" fill="none" width="100" height="70">
+        <defs><radialgradient id="cg1" cx="55%" cy="30%" r="65%"><stop offset="0%" stop-color="#FFF0A0"></stop><stop offset="60%" stop-color="#FFE066"></stop><stop offset="100%" stop-color="#FFD23D"></stop></radialgradient></defs>
+        <ellipse cx="95" cy="128" rx="75" ry="6" fill="#000" opacity=".05"></ellipse>
+        <ellipse cx="48" cy="122" rx="14" ry="8" fill="#FE9B0E"></ellipse>
+        <path d="M38,110 C30,65 50,22 100,16 C150,10 178,48 176,90 C174,115 140,126 100,126 C60,126 42,120 38,110Z" fill="url(#cg1)"></path>
+        <path d="M130,92 Q148,84 142,104" stroke="#E99D30" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5"></path>
+        <circle cx="128" cy="54" r="4.5" fill="#4F2015"></circle><circle cx="148" cy="60" r="4.5" fill="#4F2015"></circle>
+        <ellipse cx="140" cy="70" rx="7" ry="3.5" fill="#FE9B0E"></ellipse>
+      </svg>
+    </div>
+    <div class="start-marquee"><div class="marquee-track" id="marqueeTrack"><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta blurred"><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">작성자의 정보 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score blurred">4.0</div><div class="rc-stars blurred"><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class="blurred"><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">총점수+별점 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title blurred">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">리뷰 한줄평 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec blurred"><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">장점 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec blurred"><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">단점 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec blurred"><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">경영진에 바라는 점 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company blurred">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">기업명 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta blurred"><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">작성자의 정보 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score blurred">4.0</div><div class="rc-stars blurred"><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class="blurred"><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">총점수+별점 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title blurred">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">리뷰 한줄평 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec blurred"><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">장점 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec blurred"><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">단점 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company ">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec blurred"><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">경영진에 바라는 점 블라인드</div></div><div class="marquee-card"><div class="rc"><div class="rc-top"><span class="rc-company blurred">잡플래닛(유)</span></div>
+  <div class="rc-meta "><span>개발</span><span class="rc-meta-sep"></span><span>현직원</span><span class="rc-meta-sep"></span><span>경기</span><span class="rc-meta-sep"></span><span>2024. 04 작성</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ">4.0</div><div class="rc-stars "><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-on">★</span><span class="rc-star-off">★</span></div><div class=""><div class="rc-det"><div class="rc-det-l">승진 기회</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">복지/급여</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">워라밸</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">사내문화</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div><div class="rc-det"><div class="rc-det-l">경영진</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:80%"></div></div></div></div></div>
+  <div class="rc-right"><div class="rc-title ">여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳<br>합리적으로 결정하려고 노력함, 복지가 어나더레벨</div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재</div></div>
+  <div class="rc-sec "><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.</div></div>
+  <div class="rc-footer"><span>— 1년 후 성장하고 있을 것 같아요</span><span class="rc-footer-sep"></span><span>👍 기업을 추천해요</span></div></div></div></div><div class="marquee-tag">기업명 블라인드</div></div></div></div>
+    <div class="s-title">기업 리뷰<br>킹받음 티어표</div>
+    <div class="s-sub">기업 리뷰를 읽는데, 딱 하나의 정보가 가려져 있다면?<br>어떤 정보가 안 보일 때 제일 킹받는지 배치해보세요.</div>
+    <div class="s-field">
+      <input class="s-input" id="nameInput" type="text" placeholder="닉네임을 입력해주세요" maxlength="20">
+      <button class="btn-blue" id="startBtn" onclick="startGame()" disabled="">배치하러 가기</button>
+      <div class="s-divider"></div>
+      <button class="btn-ghost" onclick="showScreen(&#39;resultsScreen&#39;);renderResults();">결과 보러가기</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIER -->
+<div id="tierScreen" class="screen">
+  <div class="t-header">
+    <div class="t-header-inner container">
+      <button class="r-back" onclick="showScreen(&#39;startScreen&#39;);" style="flex-shrink:0">← 이전</button>
+      <h2>이 정보가 안 보이면 얼마나 킹받나요?</h2>
+      <button class="t-submit" id="submitBtn" onclick="submitTier()">제출하기</button>
+    </div>
+  </div>
+  <div class="t-body">
+    <div class="t-left" id="tierLeft"></div>
+    <div class="t-right">
+      <div class="t-progress"><span id="progCur">1</span> / <span id="progTotal">6</span></div>
+      <div class="t-card-area" id="cardArea"></div>
+      <div class="chick-area" id="chickArea">
+        <div class="chick-bubble" id="chickBubble"></div>
+        <svg class="chick-svg" id="chickSvg" viewBox="0 0 200 140" fill="none" style="transform:scaleX(-1)">
+          <defs><radialgradient id="cg2" cx="55%" cy="30%" r="65%"><stop offset="0%" stop-color="#FFF0A0"></stop><stop offset="60%" stop-color="#FFE066"></stop><stop offset="100%" stop-color="#FFD23D"></stop></radialgradient></defs>
+          <ellipse cx="95" cy="128" rx="75" ry="6" fill="#000" opacity=".05"></ellipse>
+          <ellipse cx="48" cy="122" rx="14" ry="8" fill="#FE9B0E"></ellipse>
+          <path d="M38,110 C30,65 50,22 100,16 C150,10 178,48 176,90 C174,115 140,126 100,126 C60,126 42,120 38,110Z" fill="url(#cg2)"></path>
+          <path d="M130,92 Q148,84 142,104" stroke="#E99D30" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5"></path>
+          <circle cx="128" cy="54" r="4.5" fill="#4F2015"></circle><circle cx="148" cy="60" r="4.5" fill="#4F2015"></circle>
+          <ellipse class="chick-beak" cx="140" cy="70" rx="7" ry="3.5" fill="#FE9B0E"></ellipse>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div id="doneScreen" class="screen">
+  <div class="done-icon">🎉</div>
+  <div class="done-title">배치 완료!</div>
+  <div class="done-sub" id="doneSub"></div>
+  <div class="done-btns">
+    <button class="btn-blue" style="width:auto;padding:14px 36px;" onclick="showScreen(&#39;startScreen&#39;);">처음으로</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="resultsScreen" class="screen">
+  <div class="r-wrap">
+    <div class="r-header"><h2>결과 모아보기</h2><button class="r-back" onclick="showScreen(&#39;startScreen&#39;);">돌아가기</button></div>
+    <div class="r-sub" id="rSub"></div>
+    <div class="r-tabs">
+      <button class="r-tab active" data-tab="dash" onclick="swTab(&#39;dash&#39;,this)">대시보드</button>
+      <button class="r-tab" data-tab="ptcp" onclick="swTab(&#39;ptcp&#39;,this)">참여 기록</button>
+    </div>
+    <div id="dashTab"></div>
+    <div id="ptcpTab" style="display:none"></div>
+  </div>
+</div>
+
+<!-- CHIP PREVIEW -->
+<div class="chip-preview" id="chipPreview"></div>
+
+<!-- MODAL -->
+<div class="modal" id="modal"><div class="modal-box"><div class="modal-top"><h3 id="mTitle"></h3><button class="modal-x" onclick="closeModal()">×</button></div><div id="mBody"></div></div></div>
+
+<script>
+const TIERS=[
+  {id:'S',label:'이거 없으면 못 봄',sub:'리뷰 자체가 무의미',color:'#FF9A9A'},
+  {id:'A',label:'상당히 킹받음',sub:'꽤 답답함',color:'#FFBE76'},
+  {id:'B',label:'은근 신경 쓰임',sub:'좀 찝찝함',color:'#FFE066'},
+  {id:'C',label:'조금 아쉬움',sub:'없어도 볼 만함',color:'#A8E6CF'},
+  {id:'D',label:'별로 안 킹받음',sub:'크게 상관없음',color:'#A8D8EA'},
+  {id:'E',label:'하나도 안 킹받음',sub:'있으나 마나',color:'#C3B1E1'},
+];
+const CASES=[
+  {id:'author',label:'작성자의 정보',hint:'작성자의 정보가 가려져 있어요',bf:['meta']},
+  {id:'score',label:'총점수+별점',hint:'총 평점과 별점이 가려져 있어요',bf:['score','stars','dets']},
+  {id:'title',label:'리뷰 한줄평',hint:'리뷰 한줄평이 가려져 있어요',bf:['title']},
+  {id:'pros',label:'장점',hint:'장점 내용이 가려져 있어요',bf:['pros']},
+  {id:'cons',label:'단점',hint:'단점 내용이 가려져 있어요',bf:['cons']},
+  {id:'mgmt',label:'경영진에 바라는 점',hint:'경영진에 바라는 점이 가려져 있어요',bf:['mgmt']},
+  {id:'company',label:'기업명',hint:'기업명이 가려져 있어요',bf:['company']},
+];
+const RV={
+  company:'잡플래닛(유)',
+  job:'개발',status:'현직원',location:'경기',date:'2024. 04 작성',
+  score:'4.0',stars:4,
+  dets:[{l:'승진 기회',p:80},{l:'복지/급여',p:80},{l:'워라밸',p:80},{l:'사내문화',p:80},{l:'경영진',p:80}],
+  title:'여러가지 시도를 할 수 있어 창의성을 키울 수 있었던 곳\n합리적으로 결정하려고 노력함, 복지가 어나더레벨',
+  pros:'대졸공채로 입사하면 지점 관리자로 계속 커나갈수있다 지점장 승진도 가능~ 관리 업무가 95%이고 이 중 대부분은 페이퍼 업무로 구성되어 큰 어려움 없이 업무 해낼 수 있음.',
+  cons:'본사의 늪에 빠지면 타지점으로 탈출하기 힘듬 물론 본사 좋아하는 사람도 더러 있음 이건 개인차 존재',
+  mgmt:'업무 유연시간제도 같은것 도입해주었으면 함. 그리고 남자들도 여직원처럼 1년 정도는 육아휴직 제도가있었음 좋겠음.',
+  growth:'1년 후 성장하고 있을 것 같아요',recommend:'기업을 추천해요',
+};
+const SK='tier_maker_results';
+const API='https://tier-maker-api.jelin.workers.dev';
+let cachedResults=null;
+const CHICK_RANDOM=['어떤게 제일 킹 받아?','고민되면 직감을 따라!','병아리도 궁금해~','흠... 진지하게 골라봐!','리뷰 잘 읽어봐~','오 고민되지?'];
+const CHICK_CTX={0:'자, 시작해볼까?',1:'좋은 시작이야!',2:'오~ 감 잡았네!',3:'벌써 반이나 했어!',4:'거의 다 왔어!',5:'마지막 하나!',6:'다 했다! 제출해줘~'};
+const CHICK_HI=['와 이건 진짜 킹받는구나?','오 확실히 킹받지!','인정~ 나도 킹받아'];
+const CHICK_LO=['이건 별로 안 킹받아?','쿨하네~','음 그래?'];
+let currentName='',placements={},cardQueue=[],animating=false;
+
+
+function showScreen(id){chipPrev.classList.remove('visible');document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+const nameInput=document.getElementById('nameInput'),startBtn=document.getElementById('startBtn');
+nameInput.addEventListener('input',()=>{startBtn.disabled=!nameInput.value.trim();});
+nameInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&nameInput.value.trim())startGame();});
+
+function startGame(){
+  currentName=nameInput.value.trim();if(!currentName)return;
+  placements={};cardQueue=[...CASES].sort(()=>Math.random()-.5);
+  buildTierRows();showCard();updateChick();showScreen('tierScreen');
+}
+function buildTierRows(){
+  const el=document.getElementById('tierLeft');el.innerHTML='';
+  TIERS.forEach(t=>{
+    const row=document.createElement('div');row.className='tier-row';row.dataset.tier=t.id;
+    row.innerHTML=`<div class="tier-row-label" style="background:${t.color}">${t.label}<small>${t.sub}</small></div><div class="tier-row-chips" data-tier="${t.id}"></div>`;
+    row.addEventListener('click',()=>placeCurrent(t.id));
+    el.appendChild(row);
+  });
+}
+function showCard(){
+  const placed=Object.keys(placements).length;
+  document.getElementById('progCur').textContent=Math.min(placed+1,CASES.length);
+  document.getElementById('progTotal').textContent=CASES.length;
+  document.getElementById('submitBtn').classList.toggle('ready',placed===CASES.length);
+  const area=document.getElementById('cardArea');
+  const remaining=cardQueue.filter(c=>!placements[c.id]);
+  if(!remaining.length){area.innerHTML=`<div class="t-card-empty">모든 카드를 배치했어요!</div>`;updateChick();return;}
+  const c=remaining[0];
+  area.innerHTML=`<div class="t-card waiting" id="currentCard"><div class="t-card-hint">${c.hint}</div>${buildRC(c.bf)}</div>`;
+  const card=document.getElementById('currentCard');
+  if(card){
+    requestAnimationFrame(()=>{card.className='t-card slide-in';});
+    // Custom drag (mouse)
+    card.addEventListener('mousedown',onCardMouseDown);
+    // Custom drag (touch)
+    card.addEventListener('touchstart',onCardTouchStart,{passive:false});
+  }
+  updateChick();
+}
+function placeCurrent(tid){
+  if(animating)return;
+  const remaining=cardQueue.filter(c=>!placements[c.id]);if(!remaining.length)return;
+  const c=remaining[0];placements[c.id]=tid;animating=true;
+  const card=document.getElementById('currentCard');if(card)card.className='t-card slide-out';
+  const ca=document.querySelector(`.tier-row-chips[data-tier="${tid}"]`);
+  const chip=document.createElement('div');chip.className='tier-chip';chip.dataset.caseId=c.id;
+  chip.innerHTML=`<div class="tier-chip-thumb">${buildRC(c.bf)}</div><div class="tier-chip-label">${c.label}</div><div class="tier-chip-arrows"><button class="tier-chip-arrow" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="event.stopPropagation();moveChip('${c.id}','up')">&#9650;</button><button class="tier-chip-arrow" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="event.stopPropagation();moveChip('${c.id}','down')">&#9660;</button></div>`;
+  chip.addEventListener('mousedown',e=>onChipDragStart(e,c.id));
+  chip.addEventListener('touchstart',e=>onChipTouchStart(e,c.id),{passive:false});
+  chip.addEventListener('mouseenter',onChipEnter);
+  chip.addEventListener('mousemove',onChipMove);
+  chip.addEventListener('mouseleave',onChipLeave);
+  ca.appendChild(chip);
+  const row=document.querySelector(`.tier-row[data-tier="${tid}"]`);
+  row.classList.add('highlight');setTimeout(()=>row.classList.remove('highlight'),400);
+  const ti=TIERS.findIndex(t=>t.id===tid);
+  if(ti<=1)setChick(CHICK_HI[Math.floor(Math.random()*CHICK_HI.length)]);
+  else if(ti>=4)setChick(CHICK_LO[Math.floor(Math.random()*CHICK_LO.length)]);
+  setTimeout(()=>{animating=false;showCard();},400);
+}
+function removeChip(cid){
+  if(animating)return;delete placements[cid];
+  const chip=document.querySelector(`.tier-chip[data-case-id="${cid}"]`);
+  if(chip){chip.classList.add('removing');setTimeout(()=>chip.remove(),250);}
+  setTimeout(()=>showCard(),300);
+}
+// Chip drag-and-drop between tiers
+let chipDragClone=null,chipDragId=null,chipDragStarted=false,chipDragSX=0,chipDragSY=0;
+function onChipDragStart(e,cid){
+  chipDragSX=e.clientX;chipDragSY=e.clientY;chipDragStarted=false;chipDragId=cid;
+  const onMove=ev=>{
+    if(!chipDragStarted&&(Math.abs(ev.clientX-chipDragSX)>5||Math.abs(ev.clientY-chipDragSY)>5)){
+      chipDragStarted=true;chipPrev.classList.remove('visible');startChipClone(cid,ev.clientX,ev.clientY);
+    }
+    if(chipDragStarted)moveChipClone(ev.clientX,ev.clientY);
+  };
+  const onUp=ev=>{
+    document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);
+    if(chipDragStarted)endChipDrag(ev.clientX,ev.clientY);
+    else{e.stopPropagation();removeChip(cid);}
+  };
+  document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+}
+function onChipTouchStart(e,cid){
+  const t=e.touches[0];chipDragSX=t.clientX;chipDragSY=t.clientY;chipDragStarted=false;chipDragId=cid;
+  const onMove=ev=>{
+    const t2=ev.touches[0];
+    if(!chipDragStarted&&(Math.abs(t2.clientX-chipDragSX)>5||Math.abs(t2.clientY-chipDragSY)>5)){
+      chipDragStarted=true;chipPrev.classList.remove('visible');startChipClone(cid,t2.clientX,t2.clientY);
+    }
+    if(chipDragStarted){moveChipClone(t2.clientX,t2.clientY);ev.preventDefault();}
+  };
+  const onEnd=ev=>{
+    document.removeEventListener('touchmove',onMove);document.removeEventListener('touchend',onEnd);
+    if(chipDragStarted){const t2=ev.changedTouches[0];endChipDrag(t2.clientX,t2.clientY);}
+    else{e.stopPropagation();removeChip(cid);}
+  };
+  document.addEventListener('touchmove',onMove,{passive:false});document.addEventListener('touchend',onEnd);
+}
+function startChipClone(cid,x,y){
+  const chip=document.querySelector(`.tier-chip[data-case-id="${cid}"]`);if(!chip)return;
+  chip.classList.add('chip-dragging');
+  chipDragClone=chip.cloneNode(true);chipDragClone.className='chip-drag-clone';
+  chipDragClone.style.width=chip.offsetWidth+'px';
+  chipDragClone.style.left=(x-chip.offsetWidth/2)+'px';chipDragClone.style.top=(y-30)+'px';
+  document.body.appendChild(chipDragClone);
+}
+function moveChipClone(x,y){
+  if(!chipDragClone)return;
+  chipDragClone.style.left=(x-chipDragClone.offsetWidth/2)+'px';chipDragClone.style.top=(y-30)+'px';
+  document.querySelectorAll('.tier-row').forEach(r=>r.classList.remove('drag-over'));
+  const el=document.elementFromPoint(x,y);
+  if(el){const row=el.closest('.tier-row');if(row)row.classList.add('drag-over');}
+}
+function endChipDrag(x,y){
+  document.querySelectorAll('.tier-row').forEach(r=>r.classList.remove('drag-over'));
+  const chip=document.querySelector(`.tier-chip[data-case-id="${chipDragId}"]`);
+  if(chip)chip.classList.remove('chip-dragging');
+  if(chipDragClone){chipDragClone.remove();chipDragClone=null;}
+  const el=document.elementFromPoint(x,y);
+  if(el){
+    const row=el.closest('.tier-row');
+    if(row&&chip){
+      const newTier=row.dataset.tier;
+      placements[chipDragId]=newTier;
+      row.querySelector('.tier-row-chips').appendChild(chip);
+      row.classList.add('highlight');setTimeout(()=>row.classList.remove('highlight'),400);
+    }
+  }
+  chipDragId=null;
+}
+function moveChip(cid,dir){
+  const curTier=placements[cid];
+  const curIdx=TIERS.findIndex(t=>t.id===curTier);
+  const newIdx=dir==='up'?curIdx-1:curIdx+1;
+  if(newIdx<0||newIdx>=TIERS.length)return;
+  chipPrev.classList.remove('visible');
+  placements[cid]=TIERS[newIdx].id;
+  const chip=document.querySelector(`.tier-chip[data-case-id="${cid}"]`);
+  const target=document.querySelector(`.tier-row-chips[data-tier="${TIERS[newIdx].id}"]`);
+  if(chip&&target)target.appendChild(chip);
+}
+function buildRC(bf){
+  const b=f=>bf.includes(f)?'blurred':'',d=RV;
+  const stars=Array.from({length:5},(_,i)=>`<span class="${i<d.stars?'rc-star-on':'rc-star-off'}">&#9733;</span>`).join('');
+  const dets=d.dets.map(x=>`<div class="rc-det"><div class="rc-det-l">${x.l}</div><div class="rc-det-bar"><div class="rc-det-fill" style="width:${x.p}%"></div></div></div>`).join('');
+  return`<div class="rc"><div class="rc-top"><span class="rc-company ${b('company')}">${d.company}</span></div>
+  <div class="rc-meta ${b('meta')}"><span>${d.job}</span><span class="rc-meta-sep"></span><span>${d.status}</span><span class="rc-meta-sep"></span><span>${d.location}</span><span class="rc-meta-sep"></span><span>${d.date}</span></div>
+  <div class="rc-body"><div class="rc-left"><div class="rc-score ${b('score')}">${d.score}</div><div class="rc-stars ${b('stars')}">${stars}</div><div class="${b('dets')}">${dets}</div></div>
+  <div class="rc-right"><div class="rc-title ${b('title')}">${d.title.replace(/\n/g,'<br>')}</div>
+  <div class="rc-sec ${b('pros')}"><span class="rc-tag rc-tag-pro">장점</span><div class="rc-text">${d.pros}</div></div>
+  <div class="rc-sec ${b('cons')}"><span class="rc-tag rc-tag-con">단점</span><div class="rc-text">${d.cons}</div></div>
+  <div class="rc-sec ${b('mgmt')}"><span class="rc-tag rc-tag-mgmt">경영진에 바라는 점</span><div class="rc-text">${d.mgmt}</div></div>
+  <div class="rc-footer"><span>&#8212; ${d.growth}</span><span class="rc-footer-sep"></span><span>&#x1F44D; ${d.recommend}</span></div></div></div></div>`;
+}
+
+// Init marquee
+(function(){
+  const track=document.getElementById('marqueeTrack');
+  const cards=CASES.map(c=>`<div class="marquee-card">${buildRC(c.bf)}<div class="marquee-tag">${c.label} 블라인드</div></div>`).join('');
+  track.innerHTML=cards+cards;
+})();
+
+// ===== CHIP HOVER PREVIEW =====
+const chipPrev=document.getElementById('chipPreview');
+function onChipEnter(e){
+  const cid=this.dataset.caseId;
+  const c=CASES.find(x=>x.id===cid);if(!c)return;
+  chipPrev.innerHTML=`<div class="t-card-hint">${c.hint}</div>`+buildRC(c.bf);
+  chipPrev.classList.add('visible');
+  posChipPrev(e);
+}
+function onChipMove(e){posChipPrev(e);}
+function onChipLeave(){chipPrev.classList.remove('visible');}
+function posChipPrev(e){
+  const w=chipPrev.offsetWidth,h=chipPrev.offsetHeight;
+  let x=e.clientX+16,y=e.clientY-h/2;
+  if(x+w>innerWidth-8)x=e.clientX-w-16;
+  if(y<8)y=8;
+  if(y+h>innerHeight-8)y=innerHeight-h-8;
+  chipPrev.style.left=x+'px';chipPrev.style.top=y+'px';
+}
+
+// ===== CUSTOM DRAG =====
+let dragClone=null,dragStarted=false,dragStartX=0,dragStartY=0;
+
+function onCardMouseDown(e){
+  if(animating)return;
+  dragStartX=e.clientX;dragStartY=e.clientY;dragStarted=false;
+  const onMove=ev=>{
+    if(!dragStarted&&(Math.abs(ev.clientX-dragStartX)>6||Math.abs(ev.clientY-dragStartY)>6)){
+      dragStarted=true;startClone(ev.clientX,ev.clientY);
+    }
+    if(dragStarted)moveClone(ev.clientX,ev.clientY);
+  };
+  const onUp=ev=>{
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+    if(dragStarted)endDrag(ev.clientX,ev.clientY);
+  };
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onUp);
+}
+
+function onCardTouchStart(e){
+  if(animating)return;
+  const t=e.touches[0];dragStartX=t.clientX;dragStartY=t.clientY;dragStarted=false;
+  const onMove=ev=>{
+    const t2=ev.touches[0];
+    if(!dragStarted&&(Math.abs(t2.clientX-dragStartX)>6||Math.abs(t2.clientY-dragStartY)>6)){
+      dragStarted=true;startClone(t2.clientX,t2.clientY);
+    }
+    if(dragStarted){moveClone(t2.clientX,t2.clientY);ev.preventDefault();}
+  };
+  const onEnd=ev=>{
+    document.removeEventListener('touchmove',onMove);
+    document.removeEventListener('touchend',onEnd);
+    if(dragStarted){const t2=ev.changedTouches[0];endDrag(t2.clientX,t2.clientY);}
+  };
+  document.addEventListener('touchmove',onMove,{passive:false});
+  document.addEventListener('touchend',onEnd);
+}
+
+function startClone(x,y){
+  const card=document.getElementById('currentCard');if(!card)return;
+  card.classList.add('dragging-src');
+  dragClone=card.cloneNode(true);
+  dragClone.className='drag-clone';
+  dragClone.style.width=card.offsetWidth+'px';
+  dragClone.style.left=(x-card.offsetWidth/2)+'px';
+  dragClone.style.top=(y-40)+'px';
+  document.body.appendChild(dragClone);
+}
+
+function moveClone(x,y){
+  if(!dragClone)return;
+  dragClone.style.left=(x-dragClone.offsetWidth/2)+'px';
+  dragClone.style.top=(y-40)+'px';
+  // Highlight tier row under cursor
+  document.querySelectorAll('.tier-row').forEach(r=>r.classList.remove('drag-over'));
+  const el=document.elementFromPoint(x,y);
+  if(el){const row=el.closest('.tier-row');if(row)row.classList.add('drag-over');}
+}
+
+function endDrag(x,y){
+  document.querySelectorAll('.tier-row').forEach(r=>r.classList.remove('drag-over'));
+  const card=document.getElementById('currentCard');
+  if(card)card.classList.remove('dragging-src');
+  if(dragClone){dragClone.remove();dragClone=null;}
+  // Find tier row at drop point
+  const el=document.elementFromPoint(x,y);
+  if(el){const row=el.closest('.tier-row');if(row)placeCurrent(row.dataset.tier);}
+}
+
+// Chick
+let chickTimer=null;
+function updateChick(){
+  const n=Object.keys(placements).length;
+  if(CHICK_CTX[n])setChick(CHICK_CTX[n]);
+  else setChick(CHICK_RANDOM[Math.floor(Math.random()*CHICK_RANDOM.length)]);
+}
+function setChick(msg){
+  document.getElementById('chickBubble').textContent=msg;
+  const svg=document.getElementById('chickSvg');
+  svg.classList.remove('chick-speaking');
+  void svg.offsetWidth;
+  svg.classList.add('chick-speaking');
+  clearTimeout(chickTimer);
+  chickTimer=setTimeout(()=>svg.classList.remove('chick-speaking'),2000);
+}
+
+async function submitTier(){
+  if(Object.keys(placements).length<CASES.length){alert('모든 카드를 배치해주세요!');return;}
+  const entry={name:currentName,timestamp:Date.now(),placements:{...placements}};
+  try{await fetch(API+'/results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});}catch(e){console.error(e);}
+  cachedResults=null;launchConfetti();
+  document.getElementById('doneSub').textContent=`${currentName}님의 킹받음 티어가 저장되었어요!`;
+  showScreen('doneScreen');
+}
+
+async function getResults(){try{const r=await fetch(API+'/results');return await r.json();}catch(e){console.error(e);return[];}}
+function swTab(t,btn){
+  document.querySelectorAll('.r-tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
+  document.getElementById('dashTab').style.display=t==='dash'?'block':'none';
+  document.getElementById('ptcpTab').style.display=t==='ptcp'?'block':'none';
+}
+async function renderResults(){
+  const r=await getResults();cachedResults=r;
+  document.getElementById('rSub').textContent=r.length?`${r.length}명이 참여했어요`:'';
+  document.querySelectorAll('.r-tab').forEach(x=>x.classList.remove('active'));
+  document.querySelector('[data-tab="dash"]').classList.add('active');
+  document.getElementById('dashTab').style.display='block';
+  document.getElementById('ptcpTab').style.display='none';
+  renderDash(r);renderPtcp(r);
+}
+
+function renderDash(res){
+  const el=document.getElementById('dashTab');
+  if(!res.length){el.innerHTML='<div class="no-data">아직 참여 기록이 없어요.<br>첫 번째로 참여해보세요!</div>';return;}
+  const sm={S:6,A:5,B:4,C:3,D:2,E:1},sc={};
+  CASES.forEach(c=>{sc[c.id]={t:0,n:0};});
+  res.forEach(r=>Object.entries(r.placements).forEach(([ci,ti])=>{if(sc[ci]){sc[ci].t+=sm[ti]||0;sc[ci].n++;}}));
+  const rk=CASES.map(c=>({...c,avg:sc[c.id].n?sc[c.id].t/sc[c.id].n:0})).sort((a,b)=>b.avg-a.avg);
+  const top=rk[0],bot=rk[rk.length-1];
+
+  let h=`<div class="dash-insight">
+    <div class="dash-insight-header"><div class="dash-insight-title">킹받음 순위</div><div class="dash-insight-count">${res.length}명 참여</div></div>
+    <div class="dash-quote">사람들은 <strong>${top.label}</strong>이(가) 안 보일 때 가장 킹받고,<br><strong>${bot.label}</strong>은(는) 없어도 별로 신경 안 써요.</div>
+    <div class="dash-rank-list">`;
+  rk.forEach((c,i)=>{
+    const pct=Math.max((c.avg/6)*100,8);
+    const tierColor=TIERS[i%TIERS.length].color;
+    h+=`<div class="dash-rank-item">
+      <div class="dash-rank-num" style="background:${tierColor}">${i+1}</div>
+      <div class="dash-rank-name">${c.label}</div>
+      <div class="dash-rank-bar-wrap"><div class="dash-rank-bar-fill" style="width:${pct}%;background:${tierColor}">${c.avg.toFixed(1)}</div></div>
+    </div>`;
+  });
+  h+='</div></div>';
+
+  // Heatmap
+  const tc={};CASES.forEach(c=>{tc[c.id]={};TIERS.forEach(t=>{tc[c.id][t.id]=0;});});
+  res.forEach(r=>Object.entries(r.placements).forEach(([ci,ti])=>{if(tc[ci]&&tc[ci][ti]!==undefined)tc[ci][ti]++;}));
+  h+=`<div class="dash-dist"><div class="dash-dist-title">티어 분포</div><div class="heat-grid">`;
+  rk.forEach(c=>{
+    h+=`<div class="heat-row"><div class="heat-lbl">${c.label}</div><div class="heat-bar">`;
+    TIERS.forEach(t=>{const cn=tc[c.id][t.id],pc=(cn/res.length)*100;
+    if(pc>0)h+=`<div class="heat-seg" style="width:${pc}%;background:${t.color}" title="${t.label}: ${cn}명">${pc>=16?t.id:''}</div>`;});
+    h+='</div></div>';
+  });
+  h+=`</div><div class="heat-legend">${TIERS.map(t=>`<div class="heat-legend-i"><div class="heat-legend-d" style="background:${t.color}"></div>${t.label}</div>`).join('')}</div></div>`;
+  el.innerHTML=h;
+}
+
+function renderPtcp(res){
+  const el=document.getElementById('ptcpTab');
+  if(!res.length){el.innerHTML='<div class="no-data">아직 참여 기록이 없어요</div>';return;}
+  const cols=['#00C473','#FFA502','#2ED573','#FF6B6B','#A855F7','#FF6348'];
+  let h='<div class="p-list">';
+  res.slice().reverse().forEach((r,i)=>{const idx=res.length-1-i;const d=new Date(r.timestamp);
+  const ds=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  h+=`<div class="p-item" onclick="showDetail(${idx})"><div class="p-avatar" style="background:${cols[idx%cols.length]}">${esc(r.name).charAt(0)}</div><div class="p-info"><div class="p-name">${esc(r.name)}</div><div class="p-time">${ds}</div></div><button class="p-del" onclick="event.stopPropagation();delP(${idx})">삭제</button><div class="p-arrow">&#8250;</div></div>`;});
+  h+='</div>';el.innerHTML=h;
+}
+async function delP(i){if(!confirm('삭제할까요?'))return;try{await fetch(API+'/results/'+i,{method:'DELETE'});}catch(e){console.error(e);}cachedResults=null;renderResults();}
+async function showDetail(i){
+  const all=cachedResults||await getResults();const r=all[i];if(!r)return;
+  document.getElementById('mTitle').textContent=`${r.name}님의 배치`;
+  let h='<div class="modal-tl">';
+  TIERS.forEach(t=>{const items=Object.entries(r.placements).filter(([_,ti])=>ti===t.id).map(([ci])=>CASES.find(c=>c.id===ci)).filter(Boolean);
+  h+=`<div class="modal-tr"><div class="modal-tlab" style="background:${t.color}">${t.label}</div><div class="modal-ti">${items.length?items.map(c=>`<div class="modal-tc">${c.label}</div>`).join(''):'<span style="color:#4E5058;font-size:12px">-</span>'}</div></div>`;});
+  h+='</div>';document.getElementById('mBody').innerHTML=h;document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+
+function launchConfetti(){
+  const c=['#FFD5D5','#DBA8E0','#6DB5A0','#D5F0D5','#B5C5E5','#00C473','#FFD93D'];
+  for(let i=0;i<50;i++){const p=document.createElement('div');p.className='confetti-piece';
+  p.style.cssText=`background:${c[i%c.length]};left:${Math.random()*100}vw;top:-10px;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>.5?'50%':'2px'}`;
+  document.body.appendChild(p);const dur=1500+Math.random()*1500,xd=(Math.random()-.5)*200;
+  p.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${xd}px,${innerHeight+20}px) rotate(${Math.random()*720}deg)`,opacity:0}],{duration:dur,easing:'ease-out'}).onfinish=()=>p.remove();}
+}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+</script>
+
+
+</body></html>
